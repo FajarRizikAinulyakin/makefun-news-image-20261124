@@ -4,20 +4,39 @@
 [![rank](https://make.fun/badge/news-image-20261124/FajarRizikAinulyakin/makefun-news-image-20261124/rank.svg)](https://make.fun/bounty/news-image-20261124/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261124)
 [![reward](https://make.fun/badge/news-image-20261124/FajarRizikAinulyakin/makefun-news-image-20261124/reward.svg)](https://make.fun/bounty/news-image-20261124?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261124)
 
-A single 1024×1024 newspaper front page for Tuesday 24 November 2026: six stories, one image.
-
-## The poster
-
-`entry.png` is the whole entry — a black-and-white front page under the masthead "THE WORLD TODAY", dated Tuesday 24 November 2026. Its lead story is Ukraine sinking the Russian corvette Merkury off Libya; the five stories below it cover Jensen Huang's return to Nvidia, the Oxfam report calling Gaza a toxic wasteland, Moscow's "open war" warning to Estonia, the appeals court giving Trump a path to erase his hush-money conviction, and FIFA naming the hosts of the 2031 and 2035 Women's World Cups.
+This repository holds a single image: a 1024 by 1024 black-and-white
+newspaper front page for Tuesday 24 November 2026, published under the
+masthead "THE WORLD TODAY". The page is laid out like a classic broadsheet,
+with a bold headline banner across the top and columns of stories below
+it. Six stories share the front page. The lead item reports Ukraine
+sinking a Russian warship off the coast of Libya. The remaining stories
+cover Nvidia shares soaring, the situation in Gaza, Moscow warning
+Estonia, the Trump hush-money case, and FIFA naming the hosts of the
+2031 and 2035 tournaments.
 
 ## How it works
 
-`main.py` (Python 3.13, standard library only) copies `entry.png` into `/output/entry.png` and creates `/output` when it is not there. It has no arguments, no network use and no randomness: run it twice and the two outputs are byte-for-byte the same file. The sources behind each headline are recorded in `SOURCES.md` in the build notes, which is not part of this repository.
+`main.py` does one simple job: it duplicates `entry.png` into the output
+folder, byte for byte, and then checks that the duplicate has exactly
+the same size as the original. The script uses only the Python standard
+library, needs no arguments, opens no network connections, and involves
+no randomness or timestamps, so every run over the same poster produces
+an identical file.
 
 ## Running it
 
-```bash
+```sh
 python3 main.py
 ```
 
-Afterwards the poster is at `/output/entry.png`.
+By default the copy lands at `/output/entry.png`. To place it somewhere
+else, set the `MAKEFUN_OUTPUT_DIR` environment variable before running
+the script, for example:
+
+```sh
+MAKEFUN_OUTPUT_DIR=/tmp/poster python3 main.py
+```
+
+## License
+
+See `LICENSE`.

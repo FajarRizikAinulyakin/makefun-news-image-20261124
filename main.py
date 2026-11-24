@@ -1,36 +1,68 @@
-"""Ship the finished front page for Tuesday 24 November 2026.
+"""Duplicate the finished newspaper poster to the output folder.
 
-The poster is stored next to this file as entry.png: a black-and-white
-newspaper front page that sums up the day's world news under the masthead
-"THE WORLD TODAY". This program does one thing only — it copies that file,
-byte for byte, to /output/entry.png (or to $MAKEFUN_OUTPUT_DIR when that is
-set), creating the destination folder first.
+This script takes the poster image that lives beside it and writes an
+exact byte-for-byte duplicate to the destination directory. The output
+directory is taken from the MAKEFUN_OUTPUT_DIR environment variable when
+it is set, and defaults to /output otherwise. The destination folder is
+created first if it is not already there, and the copy is checked by
+comparing the size of the duplicate against the size of the original;
+any mismatch raises an error instead of silently succeeding.
 
-It uses nothing but the Python standard library, takes no arguments, reads
-no network and makes no random choices, so running it twice writes the
-same bytes twice.
+Only the Python standard library is used, and the script takes no
+command-line arguments, opens no network connections, and introduces
+no randomness, so running it twice over the same poster always
+produces identical bytes.
 """
 
 import os
-from pathlib import Path
+import shutil
+import sys
 
-POSTER = Path(__file__).resolve().parent / "entry.png"
+POSTER_NAME = "entry.png"
+
+DEFAULT_OUTPUT_FOLDER = "/output"
+
+OUTPUT_DIR_ENV = "MAKEFUN_OUTPUT_DIR"
 
 
-def output_path() -> Path:
-    """Return where the poster must land."""
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    return Path(out_dir) / "entry.png"
+def locate_poster() -> str:
+    """Return the path of the poster image next to this script."""
+    script_folder = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_folder, POSTER_NAME)
 
 
-def main() -> None:
-    poster_bytes = POSTER.read_bytes()
-    target = output_path()
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(poster_bytes)
-    if target.read_bytes() != poster_bytes:
-        raise RuntimeError("copy mismatch: %s differs from %s" % (target, POSTER))
+def choose_output_folder() -> str:
+    """Pick the output folder from the environment, or the default."""
+    chosen = os.environ.get(OUTPUT_DIR_ENV)
+    if chosen:
+        return chosen
+    return DEFAULT_OUTPUT_FOLDER
+
+
+def duplicate_poster(source_path: str, target_path: str) -> None:
+    """Write an exact copy of the poster and check its size matches."""
+    target_folder = os.path.dirname(target_path)
+    if target_folder:
+        os.makedirs(target_folder, exist_ok=True)
+    shutil.copyfile(source_path, target_path)
+    source_size = os.path.getsize(source_path)
+    target_size = os.path.getsize(target_path)
+    if source_size != target_size:
+        raise ValueError(
+            f"copy size mismatch: source {source_size} bytes, "
+            f"copy {target_size} bytes"
+        )
+
+
+def run() -> int:
+    """Copy the poster and report the result; nonzero on failure."""
+    poster_path = locate_poster()
+    output_folder = choose_output_folder()
+    destination_path = os.path.join(output_folder, POSTER_NAME)
+    duplicate_poster(poster_path, destination_path)
+    print(f"copied {poster_path} -> {destination_path}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(run())
